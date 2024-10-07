@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown';
+
 export default function Message({ role, content }) {
 
     return (
@@ -6,7 +8,9 @@ export default function Message({ role, content }) {
                 <span className="w-8 h-8 flex justify-center items-center">{role}</span>
             </div>
             <div className="flex flex-col w-full leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-                <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{content}</p>
+                <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white">
+                    <ReactMarkdown>{content}</ReactMarkdown>
+                </p>
             </div>
         </div>
     );

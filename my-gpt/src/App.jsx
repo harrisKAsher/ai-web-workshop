@@ -1,18 +1,23 @@
 import {useState} from 'react'
 import Message from "./components/api/Message.jsx";
+import Loader from "./components/api/Loader.jsx";
 
 export default function App() {
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState([])
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmitQuestion(question) {
+    setLoading(true);
+    const body = JSON.stringify({question})
+    setQuestion('');
     try {
       const response = await fetch('http://localhost:3000/api/message', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({question}),
+        body,
       });
       const data = await response.json();
       setMessages([
@@ -21,6 +26,8 @@ export default function App() {
       ]);
     } catch (e) {
       console.error(e)
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -29,6 +36,7 @@ export default function App() {
       <div className="flex max-w-full flex-1 flex-col">
         <div className="relative h-full w-full transition-width flex flex-col overflow-hidden items-stretch flex-1">
           <div className="flex-1 overflow-hidden dark:bg-gray-800">
+
             <h1
               className="text-2xl sm:text-4xl font-semibold text-center text-gray-200 dark:text-gray-600 flex gap-4 p-4 items-center justify-center">
               My GPT
@@ -36,14 +44,18 @@ export default function App() {
             <div className="h-4/5 overflow-auto">
               <div className="h-full flex flex-col items-center text-sm dark:bg-gray-800">
                 {messages.map(message => {
-                  return <Message role={message.role} content={message.content} />
+                  return <Message key={message.content} role={message.role} content={message.content} />
                 })}
               </div>
+
             </div>
           </div>
 
+
+
           <div
             className="absolute bottom-0 left-0 w-full border-t md:border-t-0 dark:border-white/20 md:border-transparent md:dark:border-transparent md:bg-vert-light-gradient bg-white dark:bg-gray-800 md:!bg-transparent dark:md:bg-vert-dark-gradient pt-2">
+            {loading && <Loader />}
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -60,6 +72,7 @@ export default function App() {
                     placeholder="Send a message..."
                     className="m-0 w-full resize-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent pl-2 md:pl-0"
                     onChange={(e) => setQuestion(e.currentTarget.value)}
+                    onKeyDown={(e) => {e.key === 'Enter' && handleSubmitQuestion(question)}}
                   ></textarea>
                   <button
                       onClick={() => handleSubmitQuestion(question)}
